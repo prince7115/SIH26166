@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trinetra"
+version = "1.0.0"
+description = "Registration of Chandrayaan-2 OHRC imagery to LRO NAC and TMC-2 reference frames"
+requires-python = ">=3.10"
+dependencies = [
+    "flask",
+    "flask-cors",
+    "pyngrok",
+    "numpy",
+    "opencv-python",
+    "scikit-image",
+    "scikit-learn",
+    "scipy",
+    "matplotlib",
+    "pillow",
+    "torch",
+    "transformers",
+    "planetaryimage",
+    "pvl",
+]
+
+[project.scripts]
+trinetra = "trinetra.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["trinetra*"]

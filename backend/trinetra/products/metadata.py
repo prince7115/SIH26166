@@ -1,27 +1,28 @@
-"""Dataset metadata for the website's "Dataset" block.
+"""Label metadata for the website's Dataset panel.
 
-Reads only the product labels (PDS4 XML for OHRC / TMC-2, the PDS3 text header of an LROC NAC
-.IMG) and never touches the rasters, so it answers in milliseconds even for multi-GB strips.
-Every product is normalised to the same record so the website can show them side by side.
+Only labels are read (PDS4 XML, or the PDS3 header of a NAC .IMG), never rasters, so this
+answers in milliseconds even for multi-GB strips. Every product becomes the same record shape.
 """
 import os
-import re
 from datetime import datetime
-import xml.etree.ElementTree as ET
 
-from .common import NS, KM_PER_DEG_LAT, km_per_deg_lon, unwrap_lon
-
-_CORNER_TAGS = (("UL", "upper_left"), ("UR", "upper_right"), ("LL", "lower_left"), ("LR", "lower_right"))
-
-
-def _float(v):
-    try: return None if v is None else float(str(v).strip().split()[0])
-    except (TypeError, ValueError): return None
+from .discovery import product_id
+from .pds3 import read_header
+from .pds4 import Pds4Label, parse_number
+from .sun import azimuth_gap
+from ..geometry.geodesy import KM_PER_DEG_LAT, km_per_deg_lon, unwrap_lon
 
 
 def _int(v):
-    f = _float(v)
+    f = parse_number(v)
     return None if f is None else int(f)
+
+
+def _file_size(path):
+    try:
+        return os.path.getsize(path)
+    except OSError:
+        return None
 
 
 def footprint(corners):
@@ -47,85 +48,46 @@ def footprint(corners):
 
 
 def pds4_record(img_path, xml_path):
-    """Metadata of an ISRO PDS4 product (OHRC, TMC-2) from its XML label."""
-    root = ET.parse(xml_path).getroot()
-
-    def txt(path):
-        el = root.find(path, NS)
-        return el.text.strip() if el is not None and el.text else None
-
-    dims = {a.find("pds:axis_name", NS).text: int(a.find("pds:elements", NS).text)
-            for a in root.findall(".//pds:Array_2D_Image/pds:Axis_Array", NS)}
-
-    corners, corners_source = None, None
-    for tag, label in (("Refined_Corner_Coordinates", "label (refined)"),
-                       ("System_Level_Coordinates", "label (system level)")):
-        geom = root.find(f".//isda:{tag}", NS)
-        if geom is not None:
-            corners = {k: {"lat": float(geom.find(f"isda:{t}_latitude", NS).text),
-                           "lon": float(geom.find(f"isda:{t}_longitude", NS).text) % 360.0}
-                       for k, t in _CORNER_TAGS}
-            corners_source = label
-            break
-
-    instrument = None
-    for obs in root.findall(".//pds:Observing_System_Component", NS):
-        if (obs.findtext("pds:type", default="", namespaces=NS) or "").strip() == "Instrument":
-            instrument = (obs.findtext("pds:name", default="", namespaces=NS) or "").strip() or None
-
+    """An ISRO PDS4 product (OHRC, TMC-2)."""
+    label = Pds4Label(xml_path)
+    dims = label.dims()
+    corners, source = label.corners()
+    instrument = label.instrument()
     return {
-        "product_id": os.path.splitext(os.path.basename(img_path))[0],
+        "product_id": product_id(img_path),
         "format": "PDS4",
         "mission": "Chandrayaan-2",
-        "instrument": instrument.title() if instrument else txt(".//pds:title"),
-        "start_time": txt(".//pds:start_date_time"),
-        "stop_time": txt(".//pds:stop_date_time"),
-        "orbit": _int(txt(".//isda:imaging_orbit_number")),
-        "processing_level": txt(".//pds:processing_level"),
+        "instrument": instrument.title() if instrument else label.text(".//pds:title"),
+        "start_time": label.text(".//pds:start_date_time"),
+        "stop_time": label.text(".//pds:stop_date_time"),
+        "orbit": _int(label.text(".//isda:imaging_orbit_number")),
+        "processing_level": label.text(".//pds:processing_level"),
         "lines": dims.get("Line"), "samples": dims.get("Sample"),
-        "data_type": txt(".//pds:Element_Array/pds:data_type"),
-        "gsd_m": _float(txt(".//isda:pixel_resolution")),
-        "altitude_km": _float(txt(".//isda:spacecraft_altitude")),
-        "sun_elev_deg": _float(txt(".//isda:sun_elevation")),
-        "sun_azim_deg": _float(txt(".//isda:sun_azimuth")),
+        "data_type": label.text(".//pds:Element_Array/pds:data_type"),
+        "gsd_m": label.number(".//isda:pixel_resolution"),
+        "altitude_km": label.number(".//isda:spacecraft_altitude"),
+        "sun_elev_deg": label.number(".//isda:sun_elevation"),
+        "sun_azim_deg": label.number(".//isda:sun_azimuth"),
         "sun_azim_convention": "north_cw",
-        "incidence_deg": _float(txt(".//isda:solar_incidence")),
-        "roll_deg": _float(txt(".//isda:roll")),
-        "pitch_deg": _float(txt(".//isda:pitch")),
-        "orbit_direction": txt(".//isda:orbit_limb_direction"),
-        "projection": txt(".//isda:projection"),
-        "area": txt(".//isda:area"),
-        "corners": corners, "corners_source": corners_source,
+        "incidence_deg": label.number(".//isda:solar_incidence"),
+        "roll_deg": label.number(".//isda:roll"),
+        "pitch_deg": label.number(".//isda:pitch"),
+        "orbit_direction": label.text(".//isda:orbit_limb_direction"),
+        "projection": label.text(".//isda:projection"),
+        "area": label.text(".//isda:area"),
+        "corners": corners, "corners_source": f"label ({source})" if source else None,
         "footprint": footprint(corners),
-        "file_size_bytes": _int(txt(".//pds:File/pds:file_size")) or _file_size(img_path),
+        "file_size_bytes": _int(label.text(".//pds:File/pds:file_size")) or _file_size(img_path),
     }
 
 
-def _file_size(path):
-    try: return os.path.getsize(path)
-    except OSError: return None
-
-
-def pds3_header(img_path, max_bytes=65536):
-    """KEY = VALUE pairs of a PDS3 attached label (stops at END; multi-line values are skipped)."""
-    with open(img_path, "rb") as f:
-        head = f.read(max_bytes).decode("latin-1", errors="replace")
-    head = re.split(r"\r?\nEND\s*\r?\n", head, maxsplit=1)[0]
-    out = {}
-    for line in head.splitlines():
-        m = re.match(r"^\s*([A-Z0-9_:^]+)\s*=\s*(.+?)\s*$", line)
-        if m and m.group(1) not in out:
-            out[m.group(1)] = m.group(2).strip().strip('"')
-    return out
-
-
 def lroc_nac_record(img_path, corners, gsd_m, sun=None):
-    """Metadata of an LROC NAC EDR. Its label has no footprint or sun geometry, so corners/GSD
-    come from the pipeline's lookup table and sun geometry from sun.json when present."""
-    h = pds3_header(img_path)
+    """An LROC NAC EDR. Its label has no footprint or sun geometry, so corners and GSD come from
+    the pipeline's lookup table and the sun from sun.json when present."""
+    h = read_header(img_path)
     frame = h.get("FRAME_ID")
     return {
-        "product_id": h.get("PRODUCT_ID") or os.path.splitext(os.path.basename(img_path))[0],
+        "product_id": h.get("PRODUCT_ID") or product_id(img_path),
         "format": "PDS3",
         "mission": "Lunar Reconnaissance Orbiter",
         "instrument": f"LROC Narrow Angle Camera ({frame.title()})" if frame else "LROC Narrow Angle Camera",
@@ -157,9 +119,12 @@ def lroc_nac_record(img_path, corners, gsd_m, sun=None):
 
 
 def _parse_time(s):
-    if not s: return None
-    try: return datetime.fromisoformat(s.rstrip("Z")[:26])
-    except ValueError: return None
+    if not s:
+        return None
+    try:
+        return datetime.fromisoformat(s.rstrip("Z")[:26])
+    except ValueError:
+        return None
 
 
 def compare(ohrc, ref):
@@ -167,9 +132,9 @@ def compare(ohrc, ref):
     out = {}
     fo, fr = ohrc.get("footprint"), ref.get("footprint")
     if fo and fr:
-        ref_lon0 = ohrc["corners"]["UL"]["lon"]
-        o_lon = [float(unwrap_lon(c["lon"], ref_lon0)) for c in ohrc["corners"].values()]
-        r_lon = [float(unwrap_lon(c["lon"], ref_lon0)) for c in ref["corners"].values()]
+        lon0_ref = ohrc["corners"]["UL"]["lon"]
+        o_lon = [float(unwrap_lon(c["lon"], lon0_ref)) for c in ohrc["corners"].values()]
+        r_lon = [float(unwrap_lon(c["lon"], lon0_ref)) for c in ref["corners"].values()]
         lat0, lat1 = max(fo["lat_min"], fr["lat_min"]), min(fo["lat_max"], fr["lat_max"])
         lon0, lon1 = max(min(o_lon), min(r_lon)), min(max(o_lon), max(r_lon))
         if lat1 > lat0 and lon1 > lon0:
@@ -189,7 +154,7 @@ def compare(ohrc, ref):
     # Azimuths are only comparable when both are measured clockwise from north.
     if (ohrc.get("sun_azim_deg") is not None and ref.get("sun_azim_deg") is not None
             and ohrc.get("sun_azim_convention") == ref.get("sun_azim_convention") == "north_cw"):
-        out["sun_azim_gap_deg"] = abs((ohrc["sun_azim_deg"] - ref["sun_azim_deg"] + 180.0) % 360.0 - 180.0)
+        out["sun_azim_gap_deg"] = azimuth_gap(ohrc["sun_azim_deg"], ref["sun_azim_deg"])
     if ohrc.get("sun_elev_deg") is not None and ref.get("sun_elev_deg") is not None:
         out["sun_elev_gap_deg"] = abs(ohrc["sun_elev_deg"] - ref["sun_elev_deg"])
     return out
