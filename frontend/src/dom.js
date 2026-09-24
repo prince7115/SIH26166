@@ -1,0 +1,50 @@
+export const $ = (sel) => document.querySelector(sel);
+export const $$ = (sel) => document.querySelectorAll(sel);
+
+export const dom = {
+  urlInput:       $('#colab-url-input'),
+  connectBtn:     $('#connect-btn'),
+  connStatus:     $('#connection-status'),
+  configSection:  $('#config-section'),
+  pipelineSelect: $('#pipeline-select'),
+  pairSelect:     $('#pair-select'),
+  eccMode:        $('#ecc-mode'),
+  matcherSelect:  $('#matcher-select'),
+  optShadow:      $('#opt-shadow'),
+  optRescale:     $('#opt-rescale'),
+  optPolarity:    $('#opt-polarity'),
+  optCraters:     $('#opt-craters'),
+  optRetry:       $('#opt-retry'),
+  sunElev:        $('#sun-elev'),
+  sunAzim:        $('#sun-azim'),
+  sunConv:        $('#sun-conv'),
+  sunHint:        $('#sun-hint'),
+  datasetSection: $('#dataset-section'),
+  datasetPair:    $('#dataset-pair'),
+  datasetMessage: $('#dataset-message'),
+  datasetContent: $('#dataset-content'),
+  pairFacts:      $('#pair-facts'),
+  footprintMap:   $('#footprint-map'),
+  footprintLegend: $('#footprint-legend'),
+  metaTable:      $('#meta-table'),
+  resultNotes:    $('#result-notes'),
+  headerTitle:    $('#header-title'),
+  runBtn:         $('#run-btn'),
+  runProgress:    $('#run-progress'),
+  runStatus:      $('#run-status'),
+  progressFill:   $('.progress-fill'),
+  progressLabel:  $('.progress-label'),
+  pipelineFlow:   $('#pipeline-flow'),
+  flowGrid:       $('#flow-grid'),
+  flowLines:      $('#flow-lines'),
+  popup:          $('#step-popup'),
+  popupBackdrop:  $('#popup-backdrop'),
+  resultsSection: $('#results-section'),
+  metricsGrid:    $('#metrics-grid'),
+  viewerImage:    $('#viewer-image'),
+  viewerCanvas:   $('.viewer-canvas'),
+};
+
+export function stepBox(id) {
+  return dom.flowGrid.querySelector(`[data-step-id="${id}"]`);
+}

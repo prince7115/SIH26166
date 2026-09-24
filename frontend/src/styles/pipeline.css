@@ -1,0 +1,131 @@
+.pipeline-head { margin-bottom: 1.25rem; }
+.pipeline-head h2 { margin-bottom: 0; }
+.pipeline-head .helper-text { margin-top: 0.2rem; }
+
+/* ---------- Run progress ---------- */
+.run-progress { margin-bottom: 1.5rem; }
+
+.progress-track {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-2);
+}
+
+.run-status {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Step flow (laid out by flow.js) ---------- */
+.flow {
+  position: relative;
+  padding: 0.5rem 2.75rem;
+}
+
+.flow-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.link { fill: none; stroke: var(--line-strong); stroke-width: 1.5; }
+.link--done { stroke: var(--text-2); }
+.arrowhead { fill: var(--line-strong); }
+.arrowhead--done { fill: var(--text-2); }
+
+.flow-grid {
+  position: relative;
+  display: grid;
+  column-gap: 3rem;
+  row-gap: 2.5rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 108px;
+  padding: 0.75rem 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.step:hover { background: var(--surface-2); }
+
+.step-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+
+.step-group {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.step-name {
+  flex: 1;
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.step-state {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+
+.step--pending { border-color: var(--line); }
+.step--pending .step-name { color: var(--text-2); }
+
+.step--running { border-color: var(--accent); }
+.step--running .step-state { color: var(--accent); }
+
+.step--done .step-state { color: var(--ok); }
+
+.step--error { border-color: var(--err); }
+.step--error .step-state { color: var(--err); }
+
+.step[aria-expanded="true"] {
+  background: var(--surface-2);
+  outline: 1px solid var(--text-2);
+  outline-offset: -1px;
+}
+
+/* Single column on narrow screens */
+.flow--single { padding: 0.5rem 0; }
+.flow--single .flow-grid { row-gap: 2rem; }
+.flow--single .step { min-height: 0; }

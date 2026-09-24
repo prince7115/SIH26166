@@ -1,0 +1,135 @@
+/* ---------- Metric cards ---------- */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.metric-card {
+  background: var(--surface);
+  padding: 1rem;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  margin-bottom: 0.3rem;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.metric-unit {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  margin-top: 0.2rem;
+}
+
+.metric-card.good .metric-value { color: var(--ok); }
+.metric-card.warn .metric-value { color: var(--warn); }
+.metric-card.bad .metric-value { color: var(--err); }
+
+/* ---------- Notes: trust checks, difficulty, attempts ---------- */
+.result-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.result-notes:empty { display: none; }
+.note-block {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+}
+.note-title {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  margin-bottom: 0.45rem;
+}
+/* Rows are mark | label | value; labels share one column and a long value wraps in its own. */
+.note-list {
+  list-style: none;
+  font-size: 0.82rem;
+  display: grid;
+  grid-template-columns: 1rem fit-content(55%) minmax(0, 1fr);
+  column-gap: 0.75rem;
+}
+.note-list--plain { grid-template-columns: fit-content(55%) minmax(0, 1fr); }
+.note-list--plain .note-mark { display: none; }
+.note-list li { display: contents; color: var(--text-2); }
+.note-list li > span {
+  padding: 0.32rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.note-list li:last-child > span { border-bottom: none; }
+/* A row without a value lets its label span the value column. */
+.note-list li > span:last-child:not(.note-value) { grid-column: span 2; }
+.note-list--plain li > span:last-child:not(.note-value) { grid-column: 1 / -1; }
+.note-mark { font-family: var(--font-mono); }
+.note-mark.pass { color: var(--ok); }
+.note-mark.fail { color: var(--err); }
+.note-value {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Image viewer ---------- */
+.image-viewer { margin-bottom: 1.5rem; }
+
+.viewer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1rem;
+}
+
+.tab-btn {
+  padding: 0.55rem 0.9rem;
+  margin-bottom: -1px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+
+.viewer-canvas {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.viewer-canvas img {
+  max-width: 100%;
+  max-height: 600px;
+  object-fit: contain;
+}
+
+.viewer-placeholder {
+  color: var(--text-3);
+  font-size: 0.88rem;
+  padding: 3rem;
+}

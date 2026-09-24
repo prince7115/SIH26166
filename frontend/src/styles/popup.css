@@ -1,0 +1,169 @@
+/* A small popup above its step box, or (for steps with a preview image) a modal window. */
+.popup {
+  position: absolute;
+  z-index: 20;
+  width: min(380px, calc(100% - 1rem));
+  padding: 1rem 1.1rem 1.1rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-popup);
+}
+
+.popup-arrow {
+  position: absolute;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: var(--surface-2);
+  border-right: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  transform: rotate(45deg);
+}
+
+.popup--below .popup-arrow {
+  bottom: auto;
+  top: -7px;
+  transform: rotate(225deg);
+}
+
+.popup-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.popup-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-3);
+}
+
+.popup-title {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.2rem;
+}
+.popup-close:hover { color: var(--text); }
+
+.popup-facts {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.75rem;
+}
+
+.popup-facts dt {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  padding-top: 0.1rem;
+}
+
+.popup-facts dd { color: var(--text); }
+.popup-facts dd.is-none { color: var(--text-3); }
+
+.popup-summary {
+  font-size: 0.84rem;
+  color: var(--text-2);
+}
+
+.popup-run {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.popup-run-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  margin-bottom: 0.3rem;
+}
+
+.popup-detail {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.popup-figure { margin: 0; }
+
+.popup-image {
+  display: block;
+  width: 100%;
+  object-fit: contain;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+/* ---------- Modal ---------- */
+.popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--backdrop);
+}
+
+.popup--modal {
+  position: fixed;
+  z-index: 31;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(1120px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 1.25rem 1.4rem 1.4rem;
+}
+
+.popup--modal .popup-arrow { display: none; }
+.popup--modal .popup-title { font-size: 1.1rem; }
+
+.popup--modal .popup-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.popup--modal .popup-image { max-height: calc(100vh - 9rem); }
+
+/* Long strip previews are shown at a readable width and scroll along the strip. */
+.popup--modal .popup-figure--strip {
+  max-height: calc(100vh - 9rem);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+}
+.popup--modal .popup-figure--strip .popup-image {
+  width: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0 auto;
+  border: none;
+}
+
+body.modal-open { overflow: hidden; }
+
+@media (max-width: 860px) {
+  .popup--modal .popup-body { grid-template-columns: 1fr; gap: 1rem; }
+  .popup--modal .popup-image { max-height: 55vh; }
+}

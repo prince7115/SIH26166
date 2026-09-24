@@ -1,0 +1,9 @@
+#app-footer {
+  border-top: 1px solid var(--line);
+  padding: 1.5rem;
+  margin-top: 1rem;
+  color: var(--text-3);
+  font-size: 0.78rem;
+}
+
+.footer-credits { margin-top: 0.25rem; }

@@ -1,0 +1,24 @@
+.error-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--err-bg);
+  border-bottom: 1px solid var(--err);
+  padding: 0.85rem 1rem;
+}
+
+.error-banner-content {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.error-banner-text {
+  flex: 1;
+  color: var(--text);
+  font-size: 0.9rem;
+}

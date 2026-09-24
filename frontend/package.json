@@ -1,8 +1,8 @@
 {
-  "name": "sih26-pipeline-gui",
+  "name": "trinetra-frontend",
   "private": true,
   "version": "1.0.0",
-  "description": "SIH26166 — OHRC ↔ NAC Registration Pipeline GUI",
+  "description": "Trinetra website: OHRC ↔ LRO NAC / TMC-2 registration pipeline",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

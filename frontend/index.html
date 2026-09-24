@@ -9,10 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/index.css" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
 </head>
 <body>
-  <!-- ==================== HEADER ==================== -->
   <header id="app-header">
     <div class="wrap header-inner">
       <svg class="moon-mark" viewBox="0 0 32 32" aria-hidden="true">
@@ -27,7 +26,6 @@
   </header>
 
   <main>
-    <!-- ==================== CONNECTION PANEL ==================== -->
     <section id="connection-section" class="panel wrap">
       <h2>Backend connection</h2>
       <div class="connection-bar">
@@ -52,7 +50,6 @@
       </p>
     </section>
 
-    <!-- ==================== CONFIGURATION PANEL ==================== -->
     <section id="config-section" class="panel wrap" hidden>
       <h2>Run configuration</h2>
       <div class="config-grid">
@@ -130,7 +127,6 @@
       <button id="run-btn" class="btn btn-primary btn-run" disabled>Run pipeline</button>
     </section>
 
-    <!-- ==================== DATASET ==================== -->
     <section id="dataset-section" class="panel wrap" hidden>
       <div class="dataset-head">
         <h2>Dataset</h2>
@@ -152,7 +148,6 @@
       </div>
     </section>
 
-    <!-- ==================== PIPELINE FLOW ==================== -->
     <section id="pipeline-section" class="wrap wrap-wide">
       <div class="pipeline-head">
         <h2>Pipeline</h2>
@@ -199,7 +194,6 @@
       <div id="popup-backdrop" class="popup-backdrop" hidden></div>
     </section>
 
-    <!-- ==================== RESULTS ==================== -->
     <section id="results-section" class="panel wrap" hidden>
       <h2>Results</h2>
 
@@ -223,7 +217,6 @@
     </section>
   </main>
 
-  <!-- ==================== FOOTER ==================== -->
   <footer id="app-footer">
     <div class="wrap">
       <p>Trinetra · OHRC ↔ LRO NAC (v4) / TMC-2 (v5) registration</p>
@@ -231,6 +224,6 @@
     </div>
   </footer>
 
-  <script type="module" src="/app.js"></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
