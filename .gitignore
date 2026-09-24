@@ -1,6 +1,11 @@
 data/
+outputs/
 node_modules/
+dist/
 .claude/
 __pycache__/
 *.pyc
+*.egg-info/
+.venv/
+.ipynb_checkpoints/
 .env
