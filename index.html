@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trinetra — OHRC Image Registration Pipeline</title>
+  <meta name="description" content="Trinetra — Chandrayaan-2 OHRC to LRO NAC / TMC-2 image registration pipeline" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%232a2b30'/%3E%3Cpath d='M16 2a14 14 0 0 1 0 28a7 14 0 0 0 0-28z' fill='%23d9d5cb'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/index.css" />
+</head>
+<body>
+  <!-- ==================== HEADER ==================== -->
+  <header id="app-header">
+    <div class="wrap header-inner">
+      <svg class="moon-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" class="moon-dark" />
+        <path d="M16 2a14 14 0 0 1 0 28a7 14 0 0 0 0-28z" class="moon-lit" />
+      </svg>
+      <div>
+        <p class="header-brand">Trinetra</p>
+        <h1 id="header-title">OHRC ↔ NAC Registration Pipeline</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==================== CONNECTION PANEL ==================== -->
+    <section id="connection-section" class="panel wrap">
+      <h2>Backend connection</h2>
+      <div class="connection-bar">
+        <div class="input-group">
+          <input
+            type="url"
+            id="colab-url-input"
+            placeholder="https://xxxx.ngrok-free.app or http://localhost:5000"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Backend URL"
+          />
+          <button id="connect-btn" class="btn btn-primary">Connect</button>
+        </div>
+        <div id="connection-status" class="status status-disconnected" role="status">
+          <span class="status-dot"></span>
+          <span class="status-text">Disconnected</span>
+        </div>
+      </div>
+      <p class="helper-text">
+        Start the server notebook in Google Colab (or <code>colab_server.py</code> locally), then paste the URL it prints.
+      </p>
+    </section>
+
+    <!-- ==================== CONFIGURATION PANEL ==================== -->
+    <section id="config-section" class="panel wrap" hidden>
+      <h2>Run configuration</h2>
+      <div class="config-grid">
+        <div class="config-group">
+          <label for="pipeline-select">Sensor pair</label>
+          <select id="pipeline-select" class="select-input">
+            <option value="ohrc_nac">OHRC ↔ LRO NAC</option>
+            <option value="ohrc_tmc">OHRC ↔ TMC-2</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="pair-select">Image pair</label>
+          <select id="pair-select" class="select-input">
+            <option value="pair01_equatorial">pair01_equatorial</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="ecc-mode">ECC refinement (step 14)</label>
+          <select id="ecc-mode" class="select-input">
+            <option value="gated">Gated (recommended)</option>
+            <option value="legacy">Legacy (always kept)</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+
+      <details class="advanced" id="advanced">
+        <summary>Advanced: robustness options <span class="advanced-hint">all off by default</span></summary>
+
+        <fieldset class="option-set">
+          <legend>Rescue tiles that failed to match (step 12)</legend>
+          <label class="check-label"><input type="checkbox" id="opt-shadow" /><span>Shadow suppression: fill cast shadows before matching</span></label>
+          <label class="check-label"><input type="checkbox" id="opt-rescale" /><span>Multi-scale: retry the tile at 1.5× and 2× coarser scale</span></label>
+          <label class="check-label"><input type="checkbox" id="opt-polarity" /><span>Intensity match, normal and inverted polarity (lit/shadowed slopes swapped)</span></label>
+        </fieldset>
+
+        <fieldset class="option-set">
+          <legend>Extra matches and retries</legend>
+          <label class="check-label"><input type="checkbox" id="opt-craters" /><span>Crater matching: add crater-anchored matches before the final fit</span></label>
+          <label class="check-label"><input type="checkbox" id="opt-retry" /><span>Auto-retry: if the result is not trusted, rerun steps 12–14 with rescues on (up to 2 retries)</span></label>
+          <div class="config-group option-inline">
+            <label for="matcher-select">Coarse matcher (steps 8 and 11)</label>
+            <select id="matcher-select" class="select-input">
+              <option value="superglue">SuperPoint + SuperGlue</option>
+              <option value="lightglue">SuperPoint + LightGlue (downloads on first use)</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="option-set">
+          <legend>Sun geometry (only used for the difficulty score)</legend>
+          <div class="config-grid sun-grid">
+            <div class="config-group">
+              <label for="sun-elev"><span class="ref-name">NAC</span> sun elevation (°)</label>
+              <input type="number" id="sun-elev" class="text-input" step="0.01" min="-90" max="90" placeholder="not set" />
+            </div>
+            <div class="config-group">
+              <label for="sun-azim"><span class="ref-name">NAC</span> sun azimuth (°)</label>
+              <input type="number" id="sun-azim" class="text-input" step="0.01" min="0" max="360" placeholder="not set" />
+            </div>
+            <div class="config-group">
+              <label for="sun-conv">Azimuth measured</label>
+              <select id="sun-conv" class="select-input">
+                <option value="">not set</option>
+                <option value="north_cw">clockwise from north</option>
+                <option value="image_cw">clockwise in the image frame (ISIS / LROC)</option>
+                <option value="unknown">unknown</option>
+              </select>
+            </div>
+          </div>
+          <p class="helper-text" id="sun-hint"></p>
+        </fieldset>
+      </details>
+
+      <button id="run-btn" class="btn btn-primary btn-run" disabled>Run pipeline</button>
+    </section>
+
+    <!-- ==================== DATASET ==================== -->
+    <section id="dataset-section" class="panel wrap" hidden>
+      <div class="dataset-head">
+        <h2>Dataset</h2>
+        <span id="dataset-pair" class="dataset-pair"></span>
+      </div>
+      <p id="dataset-message" class="helper-text dataset-message" hidden></p>
+      <div id="dataset-content" hidden>
+        <dl id="pair-facts" class="pair-facts"></dl>
+        <div class="dataset-body">
+          <figure class="footprint">
+            <svg id="footprint-map" class="footprint-map" role="img" aria-label="Ground footprints of both products"></svg>
+            <figcaption id="footprint-legend" class="footprint-legend"></figcaption>
+          </figure>
+          <div class="meta-scroll">
+            <table id="meta-table" class="meta-table"></table>
+          </div>
+        </div>
+        <p class="helper-text">Read from the product labels (PDS4 XML for Chandrayaan-2, the PDS3 header for LROC NAC). Rasters are not loaded.</p>
+      </div>
+    </section>
+
+    <!-- ==================== PIPELINE FLOW ==================== -->
+    <section id="pipeline-section" class="wrap wrap-wide">
+      <div class="pipeline-head">
+        <h2>Pipeline</h2>
+        <p class="helper-text">Click a step to see its algorithm, model and what it does.</p>
+      </div>
+
+      <div id="run-progress" class="run-progress" hidden>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+        <div class="progress-row">
+          <span id="run-status" class="run-status"></span>
+          <span class="progress-label">0%</span>
+        </div>
+      </div>
+
+      <div id="pipeline-flow" class="flow">
+        <svg id="flow-lines" class="flow-lines" aria-hidden="true"></svg>
+        <div id="flow-grid" class="flow-grid"></div>
+
+        <div id="step-popup" class="popup" role="dialog" aria-labelledby="popup-title" hidden>
+          <span class="popup-arrow" aria-hidden="true"></span>
+          <div class="popup-head">
+            <span class="popup-num"></span>
+            <h3 id="popup-title" class="popup-title"></h3>
+            <button type="button" class="popup-close" aria-label="Close">×</button>
+          </div>
+          <div class="popup-body">
+            <figure class="popup-figure" hidden>
+              <img class="popup-image" alt="" />
+            </figure>
+            <div class="popup-info">
+              <dl class="popup-facts">
+                <dt>Algorithm</dt><dd class="popup-algo"></dd>
+                <dt>Model</dt><dd class="popup-model"></dd>
+              </dl>
+              <p class="popup-summary"></p>
+              <div class="popup-run" hidden>
+                <div class="popup-run-label">This run</div>
+                <p class="popup-detail"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="popup-backdrop" class="popup-backdrop" hidden></div>
+    </section>
+
+    <!-- ==================== RESULTS ==================== -->
+    <section id="results-section" class="panel wrap" hidden>
+      <h2>Results</h2>
+
+      <div id="metrics-grid" class="metrics-grid"></div>
+      <div id="result-notes" class="result-notes"></div>
+
+      <div id="image-viewer" class="image-viewer">
+        <div class="viewer-tabs" role="tablist">
+          <button class="tab-btn active" data-tab="overlay" role="tab">Overlay &amp; checkerboard</button>
+          <button class="tab-btn" data-tab="matches" role="tab">Correspondences</button>
+          <button class="tab-btn" data-tab="preprocessed" role="tab">Preprocessing</button>
+        </div>
+        <div class="viewer-canvas">
+          <img id="viewer-image" src="" alt="Pipeline result" />
+        </div>
+      </div>
+
+      <div class="downloads-bar">
+        <button class="btn btn-secondary btn-download" data-file="metrics" disabled>Download metrics.json</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer id="app-footer">
+    <div class="wrap">
+      <p>Trinetra · OHRC ↔ LRO NAC (v4) / TMC-2 (v5) registration</p>
+      <p class="footer-credits">OHRC and TMC-2 data: ISRO / PRADAN · LRO NAC data: NASA / LROC</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

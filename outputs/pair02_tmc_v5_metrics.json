@@ -1,0 +1,143 @@
+{
+  "pair_id": "pair02_tmc",
+  "pipeline": "ohrc_tmc",
+  "version": "v5",
+  "reference": "TMC",
+  "model": "homography",
+  "ohrc_product_id": "ch2_ohr_ncp_20250612T2031048828_d_img_d18",
+  "tmc_product_id": "ch2_tmc_ncn_20200607T2239162106_d_img_d18",
+  "n_correspondences": 1802,
+  "n_inliers": 1342,
+  "inlier_ratio": 0.7447280799112098,
+  "spatial_coverage_pct": 50.67915170263755,
+  "rmse_px_in_sample": 3.2757888650568447,
+  "rmse_m_in_sample": 8.861008879978765,
+  "rmse_px_in_sample_pre_ecc": 1.4844850687631022,
+  "rmse_px_heldout": 1.4694916706965822,
+  "rmse_m_heldout": 3.9749749692342546,
+  "rmse_px_heldout_spatial": 1.8556544581306795,
+  "rmse_m_heldout_spatial": 5.0195453092434885,
+  "heldout_spatial_folds": 5,
+  "nmi_aligned": 0.3765648553439592,
+  "nmi_misaligned_baseline": 0.07473592606867176,
+  "ecc_applied": true,
+  "ecc_mode": "gated",
+  "ecc_info": {
+    "mode": "gated",
+    "tried": [
+      {
+        "gsd_m": 10.319,
+        "score": 0.3506956214762948,
+        "kept": true
+      },
+      {
+        "gsd_m": 5.159,
+        "score": 0.38454148447062636,
+        "kept": true
+      }
+    ],
+    "score_before": 0.3391011809186253,
+    "score_after": 0.38454148447062636,
+    "kept_gsd_m": 5.159
+  },
+  "trusted": true,
+  "trusted_legacy": true,
+  "trust_checks": [
+    {
+      "name": "Inliers",
+      "value": 1342,
+      "limit": "\u2265 15",
+      "pass": true
+    },
+    {
+      "name": "Coverage",
+      "value": "50.7%",
+      "limit": "\u2265 5%",
+      "pass": true
+    },
+    {
+      "name": "Held-out RMSE",
+      "value": "1.86 px",
+      "limit": "\u2264 5 px",
+      "pass": true
+    },
+    {
+      "name": "NMI vs misaligned",
+      "value": "5.04\u00d7",
+      "limit": "\u2265 1.5\u00d7",
+      "pass": true
+    }
+  ],
+  "tiles_tried": 258,
+  "tiles_matched": 253,
+  "tile_px": 256,
+  "tiles_rescued": 0,
+  "rescued_by": {},
+  "crater_stats": null,
+  "inliers_by_source": {
+    "dense": 1342
+  },
+  "gsd_fine_m": 2.705,
+  "gsd_coarse_m": 10.318756103515625,
+  "fine_gsd_multiplier": 0.5,
+  "scale_ratio": 19.321,
+  "difficulty": {
+    "level": "medium",
+    "score": 2,
+    "factors": [
+      "sun elevation gap 13.5\u00b0 (+1)",
+      "sun azimuth gap 2.5\u00b0: shadows point the same way",
+      "scale ratio 19.3\u00d7 (+1)"
+    ],
+    "elev_gap_deg": 13.454328,
+    "azim_gap_deg": 2.5433299999999974,
+    "texture_ohrc": 13630.6,
+    "texture_ref": 10376.0,
+    "scale_ratio": 19.321
+  },
+  "ohrc_sun": {
+    "elev_deg": 28.312566,
+    "azim_deg": 201.213126,
+    "azim_convention": "north_cw",
+    "source": "label"
+  },
+  "ref_sun": {
+    "elev_deg": 41.766894,
+    "azim_deg": 203.756456,
+    "azim_convention": "north_cw",
+    "source": "label"
+  },
+  "matcher": "superglue",
+  "options": {
+    "ecc_mode": "gated",
+    "matcher": "superglue",
+    "shadow_mask": false,
+    "tile_rescale": false,
+    "tile_polarity": false,
+    "crater_matching": false,
+    "auto_retry": false
+  },
+  "attempts": [
+    {
+      "attempt": 0,
+      "label": "requested options",
+      "trusted": true,
+      "n_inliers": 1342,
+      "rmse_px_heldout_spatial": 1.8556544581306795,
+      "tiles_matched": 253
+    }
+  ],
+  "selected_attempt": 0,
+  "corners_source": "PDS4 labels (both products)",
+  "tmc_sensor": "nadir",
+  "tmc_sensor_deg": 0.0,
+  "tmc_substrip_rows": [
+    3106,
+    8763
+  ],
+  "sun_elev_ohrc": 28.312566,
+  "sun_elev_tmc": 41.766894,
+  "sun_azim_ohrc": 201.213126,
+  "sun_azim_tmc": 203.756456,
+  "sun_azim_gap_deg": 2.5433299999999974
+}
