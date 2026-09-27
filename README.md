@@ -4,7 +4,7 @@ Registers Chandrayaan-2 OHRC imagery to LRO NAC and Chandrayaan-2 TMC-2 referenc
 website runs the 18-step pipeline on a GPU backend and shows the output of every step.
 
 ```
-┌──────────────────┐     ngrok tunnel       ┌──────────────────────┐
+┌──────────────────┐                        ┌──────────────────────┐
 │  frontend/       │ ◄═══════════════════►  │  backend/ (GPU)      │
 │  Vite dev server │     REST API + SSE     │  Flask API +         │
 │  localhost:5173  │                        │  registration        │
